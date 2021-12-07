@@ -6,6 +6,17 @@
 
 using namespace std;
 
+#include <cstdlib>
+
+void clear_screen()
+{
+#ifdef _WIN32
+  system("cls");
+#else
+  system("clear");
+#endif
+}
+
 vector<string> login(vector<vector<string>> users, string username, string password)
 {
   vector<string> userData = {"not_logged_in"};
@@ -60,23 +71,30 @@ void showData(vector<vector<string>> mainData)
        << "| NO \t| Nama\t\t\t\t| Jumlah| Harga \t| Lokasi| Tanggal Masuk\t| Tanggal Update\t|\n"
        << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 
-  for (int i = 0; i < mainData.size(); i++)
+  if (mainData.size() > 0)
   {
-    cout << "| "
-         << i + 1
-         << " \t| "
-         << mainData[i][1]
-         << "\t\t\t| "
-         << mainData[i][2]
-         << "\t|"
-         << mainData[i][3]
-         << "\t\t|"
-         << mainData[i][4]
-         << "\t|"
-         << mainData[i][5]
-         << "\t|"
-         << mainData[i][6]
-         << "\t\t|\n";
+    for (int i = 0; i < mainData.size(); i++)
+    {
+      cout << "| "
+           << i + 1
+           << " \t| "
+           << mainData[i][1]
+           << "\t\t\t| "
+           << mainData[i][2]
+           << "\t|"
+           << mainData[i][3]
+           << "\t\t|"
+           << mainData[i][4]
+           << "\t|"
+           << mainData[i][5]
+           << "\t|"
+           << mainData[i][6]
+           << "\t\t|\n";
+    }
+  }
+  else
+  {
+    cout << "|\t\t\t\t\t Barang Tidak Ditemukan! \t\t\t\t\t\t|\n";
   }
   cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 }
@@ -271,7 +289,7 @@ int main()
   };
 
 landing:
-  system("clear");
+  clear_screen();
   cout << "========== Selamat datang di Aplikasi Management Gudang =========="
        << endl
        << "1. Login \n2. Register \n3. Exit \n"
@@ -280,7 +298,7 @@ landing:
   if (pilihan == 1)
   {
   login:
-    system("clear");
+    clear_screen();
     cout << "===== Menu Login ====="
          << endl;
     cout << "Masukkan Username :";
@@ -288,7 +306,7 @@ landing:
     cout << "Masukkan Password: ";
     cin >> password;
     userData = login(users, username, password);
-    system("clear");
+    clear_screen();
     if (userData[0] == "logged_in")
     {
       subData = getSubData(mainData, userData[3]);
@@ -342,7 +360,7 @@ landing:
   }
 
 menu:
-  system("clear");
+  clear_screen();
   cout << "========== Selamat datang "
        << userData[2]
        << " di Aplikasi Management Gudang =========="
@@ -359,7 +377,7 @@ menu:
        << "Masukkan nomor menu : ";
   cin >> pilihan;
 
-  system("clear");
+  clear_screen();
 
   if (pilihan == 1)
   {
@@ -399,7 +417,7 @@ menu:
       if (subMenuSort == 1 || subMenuSort == 2 || subMenuSort == 3 || subMenuSort == 4 || subMenuSort == 5 || subMenuSort == 6)
       {
         vector<vector<string>> sortedData = sortData(subData, subMenuSort, sortType);
-        system("clear");
+        clear_screen();
         showData(sortedData);
         sortType = (sortType == "asc") ? "desc" : "asc";
         goto subMenuList;
@@ -423,7 +441,7 @@ menu:
     }
     else
     {
-      system("clear");
+      clear_screen();
       cout << "Menu yang anda masukkan salah!"
            << endl;
       goto listData;
@@ -596,6 +614,6 @@ menu:
 
   cin.ignore();
   cin.get();
-  system("clear");
+  clear_screen();
   goto menu;
 }
