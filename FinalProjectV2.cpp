@@ -107,13 +107,24 @@ void showData(vector<vector<string>> data) {
 
 vector<vector<string>> sortData(vector<vector<string>> subData, int sortBy, string typeSort)
 {
-  if (typeSort == "asc") {
-    sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
-         { return A[sortBy] < B[sortBy]; });
-  }
-  else if (typeSort == "desc") {
-    sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
-         { return A[sortBy] > B[sortBy]; });
+  if (sortBy == 2 || sortBy == 3) {
+    if (typeSort == "asc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return stoi(A[sortBy]) < stoi(B[sortBy]); });
+    }
+    else if (typeSort == "desc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return stoi(A[sortBy]) > stoi(B[sortBy]); });
+    }
+  } else {
+    if (typeSort == "asc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return A[sortBy] < B[sortBy]; });
+    }
+    else if (typeSort == "desc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return A[sortBy] > B[sortBy]; });
+    }
   }
 
   return subData;
@@ -457,10 +468,29 @@ int main() {
 
     vector<string> searchResult = searchDataByName(mainData, itemName);
     if (searchResult.size() > 0) {
-      cout << "BARANG YANG ANDA MASUKKAN SUDAH ADA!";
-      cin.get();
-      clear_screen();
-      goto insertData;
+      cout << "BARANG YANG ANDA MASUKKAN SUDAH ADA!\n";
+
+      int lanjutan;
+
+      lanjutan:
+      cout  << "1. LANJUTKAN\t\t" 
+            << "2. KELUAR\n" 
+            << "MASUKKAN PILIHAN : ";
+      cin >> lanjutan;
+
+      if (lanjutan == 1){
+        clear_screen();
+        cin.ignore();
+        goto insertData;
+      } else if (lanjutan == 2){
+        goto mainMenu;
+      }else {
+        cout  << "Nomor menu yang anda masukkan salah!\n";
+        cin.ignore();
+        cin.get();
+        clear_screen();
+        goto lanjutan;
+      }
     }
     cout << "MASUKKKAN BANYAK BARANG : ";
     cin  >> itemValue;
