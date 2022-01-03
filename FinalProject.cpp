@@ -56,26 +56,20 @@ vector<vector<string>> getSubData(string role, vector<vector<string>> mainData) 
 
 void showData(vector<vector<string>> data) {
   cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-       << "| "
        << setiosflags(ios::left)
+       << "| "
        << setw(3) << "No"
        << " | "
-       << setiosflags(ios::left)
        << setw(25) << "Nama"
        << " | "
-       << setiosflags(ios::left)
        << setw(6) << "Jumlah"
        << " | "
-       << setiosflags(ios::left)
        << setw(10) << "Harga"
        << " | "
-       << setiosflags(ios::left)
        << setw(6) << "Lokasi"
        << " | "
-       << setiosflags(ios::left)
        << setw(15) << "Tanggal Masuk"
        << " | "
-       << setiosflags(ios::left)
        << setw(15) << "Tanggal Update"
        << " |\n"
        << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
