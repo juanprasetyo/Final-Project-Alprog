@@ -1,151 +1,160 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
 #include <stdlib.h>
+#include <iomanip>
+#include <algorithm>
 #include <ctime>
 
 using namespace std;
 
-#include <cstdlib>
-
-void clear_screen()
-{
-#ifdef _WIN32
-  system("cls");
-#else
-  system("clear");
-#endif
+void clear_screen() {
+  #ifdef _WIN32
+    system("cls");
+  #else
+    system("clear");
+  #endif 
 }
 
-vector<string> login(vector<vector<string>> users, string username, string password)
-{
-  vector<string> userData = {"not_logged_in"};
-  for (int i = 0; i < users.size(); i++)
-  {
-    if (username == users[i][1] && password == users[i][3])
-    {
-      userData = {
-          "logged_in",
-          users[i][0],
-          users[i][2],
-          users[i][4],
-      };
+vector<string> login(string username, string password, vector<vector<string>> users) {
+  vector<string> result;
+  for (int i = 0; i < users.size(); i++) {
+    if (users[i][1] == username && users[i][3] == password) {
+      result = users[i];
+      break;
     }
   }
 
-  return userData;
+  return result;
 }
 
-vector<vector<string>> getSubData(vector<vector<string>> mainData, string code)
-{
-  vector<vector<string>> subData;
-  if (code == "-")
-  {
-    subData = mainData;
+int checkUsername(string username, vector<vector<string>> users) {
+  int result = 0;
+  for (int i = 0; i < users.size(); i++) {
+    if (users[i][1] == username) {
+      result = 1;
+      break;
+    }
   }
-  else
-  {
-    for (auto item : mainData)
-    {
-      if (item[4] == code)
-      {
-        subData.push_back(item);
+
+  return result;
+}
+
+vector<vector<string>> getSubData(string role, vector<vector<string>> mainData) {
+  vector<vector<string>> result;
+  if (role == "-") {
+    result = mainData;
+  } else {
+    for (int i = 0; i < mainData.size(); i++) {
+      if (mainData[i][4] == role) {
+        result.push_back(mainData[i]);
       }
-      else if (item[4] == code)
-      {
-        subData.push_back(item);
-      }
-      else if (item[4] == code)
-      {
-        subData.push_back(item);
-      }
+    }
+  }
+
+  return result;
+}
+
+void showData(vector<vector<string>> data) {
+  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+       << "| "
+       << setiosflags(ios::left)
+       << setw(3) << "No"
+       << " | "
+       << setiosflags(ios::left)
+       << setw(25) << "Nama"
+       << " | "
+       << setiosflags(ios::left)
+       << setw(6) << "Jumlah"
+       << " | "
+       << setiosflags(ios::left)
+       << setw(10) << "Harga"
+       << " | "
+       << setiosflags(ios::left)
+       << setw(6) << "Lokasi"
+       << " | "
+       << setiosflags(ios::left)
+       << setw(15) << "Tanggal Masuk"
+       << " | "
+       << setiosflags(ios::left)
+       << setw(15) << "Tanggal Update"
+       << " |\n"
+       << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+
+  if (data.size() > 0) {
+    for (int i = 0; i < data.size(); i++) {
+      cout << setiosflags(ios::left)
+           << "| "
+           << setw(3) << i + 1
+           << " | "
+           << setw(25) << data[i][1]
+           << " | "
+           << setw(6) << data[i][2]
+           << " | "
+           << setw(10) << data[i][3]
+           << " | "
+           << setw(6) << data[i][4]
+           << " | "
+           << setw(15) << data[i][5]
+           << " | "
+           << setw(15) << data[i][6]
+           << " |\n";
+    }
+  } else {
+    cout << "|\t\t\t\t\t Barang Tidak Ditemukan! \t\t\t\t\t\t|\n";
+  }
+  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+}
+
+vector<vector<string>> sortData(vector<vector<string>> subData, int sortBy, string typeSort)
+{
+  if (sortBy == 2 || sortBy == 3) {
+    if (typeSort == "asc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return stoi(A[sortBy]) < stoi(B[sortBy]); });
+    }
+    else if (typeSort == "desc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return stoi(A[sortBy]) > stoi(B[sortBy]); });
+    }
+  } else {
+    if (typeSort == "asc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return A[sortBy] < B[sortBy]; });
+    }
+    else if (typeSort == "desc") {
+      sort(subData.begin(), subData.end(), [&](vector<string> &A, vector<string> &B)
+           { return A[sortBy] > B[sortBy]; });
     }
   }
 
   return subData;
 }
 
-void showData(vector<vector<string>> mainData)
+vector<string> searchDataByName(vector<vector<string>> data, string itemName)
 {
-  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-       << "| NO \t| Nama\t\t\t\t| Jumlah| Harga \t| Lokasi| Tanggal Masuk\t| Tanggal Update\t|\n"
-       << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-
-  if (mainData.size() > 0)
-  {
-    for (int i = 0; i < mainData.size(); i++)
-    {
-      cout << "| "
-           << i + 1
-           << " \t| "
-           << mainData[i][1]
-           << "\t\t\t| "
-           << mainData[i][2]
-           << "\t|"
-           << mainData[i][3]
-           << "\t\t|"
-           << mainData[i][4]
-           << "\t|"
-           << mainData[i][5]
-           << "\t|"
-           << mainData[i][6]
-           << "\t\t|\n";
-    }
-  }
-  else
-  {
-    cout << "|\t\t\t\t\t Barang Tidak Ditemukan! \t\t\t\t\t\t|\n";
-  }
-  cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n";
-}
-
-vector<string> searchDataByName(vector<vector<string>> mainData, string itemName)
-{
-  vector<string> searchResult;
-  for (int i = 0; i < mainData.size(); i++)
-  {
-    if (mainData[i][1] == itemName)
-    {
-      searchResult = mainData[i];
-      searchResult.push_back(to_string(i));
+  vector<string> result;
+  for (int i = 0; i < data.size(); i++) {
+    if (data[i][1] == itemName) {
+      result = data[i];
+      result.push_back(to_string(i));
     }
   }
 
-  return searchResult;
+  return result;
 }
 
-vector<vector<string>> searchDataByNameV2(vector<vector<string>> mainData, string itemName)
-{
-  vector<vector<string>> hasilCari;
-  for (int i = 0; i < mainData.size(); i++)
-  {
-    if (mainData[i][1].find(itemName) != std::string::npos)
-    {
-      hasilCari.push_back(mainData[i]);
+vector<vector<string>> searchDataByNameV2(vector<vector<string>> data, string itemName) {
+  vector<vector<string>> result;
+  for (int i = 0; i < data.size(); i++) {
+    if (data[i][1].find(itemName) != std::string::npos) {
+      result.push_back(data[i]);
     }
   }
 
-  return hasilCari;
+  return result;
 }
 
-vector<vector<string>> sortData(vector<vector<string>> mainData, int sortBy, string typeSort)
-{
-  cout << typeSort;
-  if (typeSort == "asc")
-  {
-    sort(mainData.begin(), mainData.end(), [&](vector<string> &A, vector<string> &B)
-         { return A[sortBy] > B[sortBy]; });
-  }
-  else if (typeSort == "desc")
-  {
-    sort(mainData.begin(), mainData.end(), [&](vector<string> &A, vector<string> &B)
-         { return A[sortBy] < B[sortBy]; });
-  }
-
-  return mainData;
-}
-
-string getTimeNow()
+string getDateNow()
 {
   char s[80];
   time_t t = time(0);
@@ -154,53 +163,49 @@ string getTimeNow()
   return s;
 }
 
-int main()
-{
-  int pilihan;
-  string username, password, realName, namaBarang, banyakBarang, hargaBarang, lokasiBarang, tanggalMasuk;
-  vector<string> userData;
-  vector<vector<string>> subData;
+int main() {
+  int menu;
+  string username, password, realName, location, itemName, itemValue, itemPrice, itemLocation, dateIn;
 
-  // Buat Vector Data User
+  //Vector Data Users
   vector<vector<string>> users = {
-      {
-          "1",
-          "admin",
-          "User Admin",
-          "12345",
-          "-",
-      },
-      {
-          "2",
-          "user1",
-          "User Gudang A",
-          "12345",
-          "A",
-      },
-      {
-          "3",
-          "user2",
-          "User Gudang B",
-          "12345",
-          "B",
-      },
-      {
-          "4",
-          "user3",
-          "User Gudang C",
-          "12345",
-          "C",
-      }
-
+    {
+        "1",            //Id User
+        "admin",        //Username
+        "User Admin",   //Real Name
+        "12345",        //Password
+        "-",            //Role "-" == Admin, selain itu pekerja biasa
+    },
+    {
+        "2",
+        "user1",
+        "User Gudang A",
+        "12345",
+        "A",
+    },
+    {
+        "3",
+        "user2",
+        "User Gudang B",
+        "12345",
+        "B",
+    },
+    {
+        "4",
+        "user3",
+        "User Gudang C",
+        "12345",
+        "C",
+    }
   };
 
-  // Buat Vector Data Barang
+  //Vector Data Barang
   vector<vector<string>> mainData = {
       {
           "1",
           "Laptop Merk J",
           "100",
-          "Harga",
+          "6000000",
           "A",
           "05/11/2021",
           "04/12/2021",
@@ -209,7 +214,7 @@ int main()
           "2",
           "Laptop Merk A",
           "645",
-          "Harga",
+          "3500000",
           "A",
           "05/11/2021",
           "04/12/2021",
@@ -218,7 +223,7 @@ int main()
           "3",
           "Laptop Merk C",
           "234",
-          "Harga",
+          "7990000",
           "B",
           "05/11/2021",
           "04/12/2021",
@@ -227,7 +232,7 @@ int main()
           "4",
           "Laptop Merk D",
           "974",
-          "Harga",
+          "9555000",
           "B",
           "05/11/2021",
           "04/12/2021",
@@ -236,7 +241,7 @@ int main()
           "5",
           "Laptop Merk B",
           "100",
-          "Harga",
+          "15000000",
           "B",
           "05/11/2021",
           "04/12/2021",
@@ -245,7 +250,7 @@ int main()
           "6",
           "Laptop Merk F",
           "758",
-          "Harga",
+          "7990000",
           "A",
           "05/11/2021",
           "04/12/2021",
@@ -254,7 +259,7 @@ int main()
           "7",
           "Laptop Merk E",
           "567",
-          "Harga",
+          "25000000",
           "C",
           "05/11/2021",
           "04/12/2021",
@@ -263,7 +268,7 @@ int main()
           "8",
           "Laptop Merk I",
           "100",
-          "Harga",
+          "19500000",
           "C",
           "05/11/2021",
           "04/12/2021",
@@ -272,7 +277,7 @@ int main()
           "9",
           "Laptop Merk G",
           "264",
-          "Harga",
+          "4500000",
           "C",
           "05/11/2021",
           "04/12/2021",
@@ -281,339 +286,384 @@ int main()
           "10",
           "Laptop Merk H",
           "126",
-          "Harga",
+          "35000000",
           "C",
           "05/11/2021",
           "04/12/2021",
       },
   };
+  
+  vector<string> userData;
+  vector<vector<string>> subData;
 
-landing:
+  landing:
   clear_screen();
-  cout << "========== Selamat datang di Aplikasi Management Gudang =========="
-       << endl
-       << "1. Login \n2. Register \n3. Exit \n"
-       << "MASUKKAN NOMOR MENU :";
-  cin >> pilihan;
-  if (pilihan == 1)
-  {
-  login:
-    clear_screen();
-    cout << "===== Menu Login ====="
-         << endl;
-    cout << "Masukkan Username :";
-    cin >> username;
-    cout << "Masukkan Password: ";
-    cin >> password;
-    userData = login(users, username, password);
-    clear_screen();
-    if (userData[0] == "logged_in")
-    {
-      subData = getSubData(mainData, userData[3]);
-      goto menu;
-    }
-    else
-    {
-      cout << "Username atau Password yang anda masukkan salah! Silahkan coba lagi!"
-           << endl;
-      goto login;
-    }
-  }
-  else if (pilihan == 2)
-  {
-    cout << "===== Registrasi User Baru ====="
-         << endl
-         << "Masukkan Nama Anda : ";
-    cin.ignore();
-    getline(cin, realName);
-    cout << "Masukkan Username : ";
-    cin >> username;
-    cout << "Masukkan Password : ";
-    cin >> password;
-    cout << "Masukkan Lokasi Bertugas (A/B/C) : ";
-    cin >> lokasiBarang;
+  cout << "```````````````````````````````````````````````````````````````````````````````````````````````````````````````````\n"
+       << "``````````WWW```````WWW```````WWW``EEEEEEEE``LLL```````CCCCCCCC``OOOOOOOO``````MMM``````MMM``````EEEEEEEE``````````\n"
+       << "```````````WWW`````WWWWW`````WWW```EEE```````LLL```````CCC```````OO````OO`````MMMMM````MMMMM`````EEE```````````````\n"
+       << "````````````WWW```WWW`WWW```WWW````EEEEEE````LLL```````CCC```````OO````OO````MMM`MMM``MMM`MMM````EEEEEE````````````\n"
+       << "`````````````WWW`WWW```WWW`WWW`````EEE```````LLL```````CCC```````OO````OO```MMM```MMMMMM```MMM```EEE```````````````\n"
+       << "``````````````WWWWW`````WWWWW``````EEEEEEEE``LLLLLLLL``CCCCCCCC``OOOOOOOO``MMM`````MMMM`````MMM``EEEEEEEE``````````\n"
+       << "```````````````````````````````````````````````````````````````````````````````````````````````````````````````````\n"
+       << "```````````````````````````````````````````` APLIKASI MANAGEMENT GUDANG ```````````````````````````````````````````\n"
+       << "````````````````````````````````````````````````````BY: KELOMPOK 7 ````````````````````````````````````````````````\n"
+       << "```````````````````````````````````````````````````````````````````````````````````````````````````````````````````\n"
+       << endl;
+  cout << "SILAHKAN PILIH MENU DIBAWAH INI" << endl;
+  cout << "1. LOGIN\n"
+       << "2. BUAT AKUN\n"
+       << "3. KELUAR\n";
+  cout << "MASUKKAN NO MENU : ";
+  cin  >> menu;
 
-    int sizeBefore = users.size();
-    vector<string> newUser = {
-        to_string(stoi(users.back()[0]) + 1),
-        username,
-        realName,
-        password,
-        lokasiBarang,
-    };
-    users.push_back(newUser);
+  if (menu == 1) {
+    login: 
+    clear_screen();
+    cout << "========== LOGIN ==========\n";
+    cout << "MASUKKAN USERNAME : ";
+    cin  >> username;
+    cout << "MASUKKAN PASSWORD : ";
+    cin  >> password;
 
-    if (sizeBefore < users.size())
-    {
-      cout << "User Berhasil dibuat.";
+    userData = login(username, password, users);
+    if (userData.size() > 0) {
+      subData = getSubData(userData[4], mainData);
+      goto mainMenu;
+    } else {
+      cout << "USERNAME / PASSWORD YANG ANDA MASUKKAN SALAH!!";
+      cin.ignore();
       cin.get();
       goto login;
     }
-    else
-    {
-      cout << "Terjadi kesalahan saat membuat user!";
-    }
-  }
-  else if (pilihan == 3)
-  {
+  } else if (menu == 2) {
+    registration:
+    char repeat = 'Y';
+
+    do {
+      clear_screen();
+
+      cout << "SILAHKAN ISI DATA DIRI ANDA!" << endl;
+      cout << "MASUKKAN NAMA ANDA : ";
+      cin  >> realName;
+      cout << "MASUKKAN USERNAME : ";
+      cin  >> username;
+
+      if (checkUsername(username, users) == 1) {
+        cout << "USERNAME YANG ANDA MASUKKAN SUDAH DIDAFTARKAN!!";
+        cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+        cin.ignore();
+        cin.get();
+        goto registration;
+      }
+
+      cout << "MASUKKAN PASSWORD : ";
+      cin  >> password;
+      cout << "MASUKKAN LOKASI TEMPAT BERTUGAS (A/B/C) : ";
+      cin  >> location;
+      cout << "\nAPAKAH DATA YANG ANDA MASUKKAN SUDAH BENAR? (Y/T) : ";
+      cin  >> repeat;
+    } while (repeat == 'T');
+
+    int id = stoi(users.back()[0]) + 1; //Ambil id dari data user terakhir + 1
+
+    //Insert data akun ke vector users
+    users.push_back({
+      to_string(id),
+      username,
+      realName,
+      password,
+      location,
+    });
+
+    cout << "USER BERHASIL DIBUAT!!";
+    cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+    cin.ignore();
+    cin.get();
+    goto landing;
+  } else if (menu == 3) {
     return 0;
+  } else {
+    cout << "MENU YANG ANDA MASUKKAN SALAH!!";
+    cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+    cin.ignore();
+    cin.get();
+    goto landing;
   }
 
-menu:
+  mainMenu:
   clear_screen();
-  cout << "========== Selamat datang "
-       << userData[2]
-       << " di Aplikasi Management Gudang =========="
-       << endl
-       << "Silahkan Pilih Menu dibawah ini : "
-       << endl
-       << "1. List Data Barang \n"
-       << "2. Input Barang Baru \n"
-       << "3. Hapus Barang \n"
-       << "4. Cari Barang \n"
-       << "5. Edit Data Barang \n"
-       << "6. Log Out"
-       << endl
-       << "Masukkan nomor menu : ";
-  cin >> pilihan;
+  cout << "SELAMAT DATANG " << userData[2] << ". SILAHKAN PILIH MENU DIBAWAH INI" << endl;
+  cout << "1. LIST DATA BARANG\n"
+       << "2. INPUT BARANG BARU\n"
+       << "3. HAPUS BARANG\n"
+       << "4. CARI BARANG\n"
+       << "5. EDIT BARANG\n"
+       << "6. LOG OUT"
+       << endl;
+  cout << "MASUKKAN NO MENU : ";
+  cin  >> menu;
 
-  clear_screen();
-
-  if (pilihan == 1)
-  {
-  listData:
+  if (menu == 1) {
+    listData:
+    clear_screen();
     int subMenuList;
-    cout << "===== List Data Barang ====="
-         << endl
-         << endl;
+
+    cout << "========== LIST DATA BARANG ==========\n\n";
 
     showData(subData);
-    string sortType = "desc";
+    string sortType = "asc";
 
-  subMenuList:
+    subMenuList:
     cout << endl;
-    cout << "1. Sort Table \t\t"
-         << "2. Tambah Data \t\t"
-         << "3. Hapus Data \t\t"
-         << "4. Keluar"
-         << endl
-         << "Masukkan pilihan : ";
-    cin >> subMenuList;
+    cout << "1. SORT TABLE\t\t"
+         << "2. TAMBAH DATA\t\t"
+         << "3. HAPUS DATA\t\t"
+         << "4. KELUAR" 
+         << endl;
+    cout << "MASUKKAN NO MENU : ";
+    cin  >> subMenuList;
 
-    if (subMenuList == 1)
-    {
+    if (subMenuList == 1) {
+      subMenuSort: 
       int subMenuSort;
 
-      cout << "1. Sort by Name \t\t"
-           << "2. Sort by Value \t\t"
-           << "3. Sort by Price \t\t"
-           << "4. Sort by Place \t\t"
-           << "5. Sort by Date of Entry \t\t"
-           << "6. Sort by Date Modified \t\t"
+      cout << "1. Sort by Name \n"
+           << "2. Sort by Value \n"
+           << "3. Sort by Price \n"
+           << "4. Sort by Place \n"
+           << "5. Sort by Date of Entry \n"
+           << "6. Sort by Date Modified \n"
            << "7. Batal"
-           << endl
-           << "Masukkan pilihan : ";
-      cin >> subMenuSort;
-      if (subMenuSort == 1 || subMenuSort == 2 || subMenuSort == 3 || subMenuSort == 4 || subMenuSort == 5 || subMenuSort == 6)
-      {
+           << endl;
+      cout << "MASUKKAN NO MENU : ";
+      cin  >> subMenuSort;
+
+      if (subMenuSort == 1 || subMenuSort == 2 || subMenuSort == 3 || subMenuSort == 4 || subMenuSort == 5 || subMenuSort == 6) {
         vector<vector<string>> sortedData = sortData(subData, subMenuSort, sortType);
         clear_screen();
         showData(sortedData);
         sortType = (sortType == "asc") ? "desc" : "asc";
-        goto subMenuList;
-      }
-      else if (subMenuSort == 7)
-      {
+        goto subMenuSort;
+      } else if (subMenuSort == 7) {
         goto listData;
+      } else {
+        cout << "MENU YANG ANDA MASUKKAN SALAH!!";
+        cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+        cin.ignore();
+        cin.get();
+        goto subMenuSort;
       }
-    }
-    else if (subMenuList == 2)
-    {
+    } else if (subMenuList == 2) {
+      cin.ignore();
       goto insertData;
-    }
-    else if (subMenuList == 3)
-    {
+    } else if (subMenuList == 3) {
       goto deleteData;
+    } else if (subMenuList == 4) {
+      goto mainMenu;
+    } else {
+      cout << "MENU YANG ANDA MASUKKAN SALAH!!";
+      cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+      cin.ignore();
+      cin.get();
+      goto subMenuList;
     }
-    else if (subMenuList == 4)
-    {
-      goto menu;
-    }
-    else
-    {
-      clear_screen();
-      cout << "Menu yang anda masukkan salah!"
-           << endl;
-      goto listData;
-    }
-  }
-  else if (pilihan == 2)
-  {
-  insertData:
-    cout << "===== Menu Input Data Baru ====="
-         << endl
-         << "Masukkan nama barang : ";
+  } else if (menu == 2) {
     cin.ignore();
-    getline(cin, namaBarang);
-    cout << "Masukkan jumlah barang : ";
-    cin >> banyakBarang;
-    cout << "Masukkan harga barang : ";
-    cin >> hargaBarang;
-    if (userData[3] == "-")
-    {
+    insertData:
+    clear_screen();
+    cout << "========== INPUT BARANG ==========\n";
+    cout << "MASUKKAN NAMA BARANG : ";
+    getline(cin, itemName);
+
+    vector<string> searchResult = searchDataByName(mainData, itemName);
+    if (searchResult.size() > 0) {
+      cout << "BARANG YANG ANDA MASUKKAN SUDAH ADA!\n";
+
+      int lanjutan;
+
+      lanjutan:
+      cout  << "1. LANJUTKAN\t\t" 
+            << "2. KELUAR\n" 
+            << "MASUKKAN PILIHAN : ";
+      cin >> lanjutan;
+
+      if (lanjutan == 1){
+        clear_screen();
+        cin.ignore();
+        goto insertData;
+      } else if (lanjutan == 2){
+        goto mainMenu;
+      }else {
+        cout  << "Nomor menu yang anda masukkan salah!\n";
+        cin.ignore();
+        cin.get();
+        clear_screen();
+        goto lanjutan;
+      }
+    }
+    cout << "MASUKKKAN BANYAK BARANG : ";
+    cin  >> itemValue;
+    cout << "MASUKKAN HARGA BARANG : ";
+    cin  >> itemPrice;
+
+    if (userData[4] == "-") {
       cout << "Masukkan Lokasi Penyimpanan : ";
-      cin >> lokasiBarang;
+      cin  >> itemLocation;
+    } else if (userData[4] == "A") {
+      itemLocation = "A";
+    } else if (userData[4] == "B") {
+      itemLocation = "B";
+    } else if (userData[4] == "C") {
+      itemLocation = "C";
     }
-    else if (userData[3] == "A")
-    {
-      lokasiBarang = "A";
-    }
-    else if (userData[3] == "B")
-    {
-      lokasiBarang = "B";
-    }
-    else if (userData[3] == "C")
-    {
-      lokasiBarang = "C";
-    }
-    cout << "Masukkan Tanggal Barang Masuk (dd/mm/yyyy) : ";
-    cin >> tanggalMasuk;
 
-    int sizeBefore = mainData.size();
+    cout << "MASUKKAN TANGGAL BARANG MASUK (DD/MM/YYYY) : ";
+    cin  >> dateIn;
 
-    vector<string> newData = {
-        to_string(stoi(mainData.back()[0]) + 1),
-        namaBarang,
-        banyakBarang,
-        hargaBarang,
-        lokasiBarang,
-        tanggalMasuk,
-        getTimeNow(),
-    };
+    mainData.push_back({
+      to_string(stoi(mainData.back()[0]) + 1),
+      itemName,
+      itemValue,
+      itemPrice,
+      itemLocation,
+      dateIn,
+      getDateNow(),
+    });
 
-    mainData.push_back(newData);
-
-    if (sizeBefore < mainData.size())
-    {
-      subData = getSubData(mainData, userData[3]);
-      cout << "Barang berhasil dimasukkan.";
-    }
-    else
-    {
-      cout << "Terjadi kesalahan saat memasukkan data!";
-    }
-  }
-  else if (pilihan == 3)
-  {
-  deleteData:
-    cout << "===== Menu Hapus Barang ====="
-         << endl;
-    cout << "Masukkan nama barang : ";
+    subData = getSubData(userData[4], mainData);
+    cout << "BARANG BERHASIL DITAMBAHKAN";
+    cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
     cin.ignore();
-    getline(cin, namaBarang);
+    cin.get();
+    if (menu == 1) {
+      goto listData;
+    } else {
+      goto mainMenu;
+    }
+  } else if (menu == 3) {
+    deleteData:
+    clear_screen();
+    cin.ignore();
 
-    vector<string> searchResult = searchDataByName(subData, namaBarang);
-    if (searchResult.size() > 0)
-    {
-      searchResult = searchDataByName(mainData, namaBarang);
-      if (searchResult.size() > 0)
-      {
+    cout << "========== HAPUS BARANG ==========\n";
+    cout << "MASUKKAN NAMA BARANG : ";
+    getline(cin, itemName);
+    
+    vector<string> searchResult = searchDataByName(subData, itemName);
+    if (searchResult.size() > 0) {
+      searchResult = searchDataByName(mainData, itemName);
+      if (searchResult.size() > 0) {
         mainData.erase(mainData.begin() + stoi(searchResult[7]));
-        subData = getSubData(mainData, userData[3]);
-        cout << namaBarang
-             << " berhasil dihapus.";
+        subData = getSubData(userData[4], mainData);
+        cout << itemName << " BERHASIL DIHAPUS!" << endl;
+      } else {
+        cout << "TERJADI KESALAHAN SAAT MENGHAPUS DATA!!" << endl;
       }
-      else
-      {
-        cout << "Terjadi kesalahan saat menghapus data!";
-      }
+    } else {
+      cout << itemName << " TIDAK DITEMUKAN!!" << endl;
     }
-    else
-    {
-      cout << "Nama Barang Tidak Ditemukan!";
+
+    cout << "\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+    cin.get();
+    
+    if (menu == 1) {
+      goto listData;
+    } else {
+      goto mainMenu;
     }
-  }
-  else if (pilihan == 4)
-  {
-    cout << "===== Menu Cari Barang ====="
-         << endl;
-    cout << "Masukkan nama barang : ";
+  } else if (menu == 4) {
+    searchData:
+    clear_screen();
     cin.ignore();
-    getline(cin, namaBarang);
-    vector<vector<string>> searchResult = searchDataByNameV2(subData, namaBarang);
+
+    cout << "========== CARI BARANG ==========\n";
+    cout << "MASUKKAN NAMA BARANG : ";
+    getline(cin, itemName);
+
+    vector<vector<string>> searchResult = searchDataByNameV2(subData, itemName);
     showData(searchResult);
-  }
-  else if (pilihan == 5)
-  {
-  edit:
-    cout << "===== Menu Edit Data ====="
-         << endl
-         << "Masukkan nama barang : ";
+
+    cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+    cin.get();
+    goto mainMenu;
+  } else if (menu == 5) {
     cin.ignore();
-    getline(cin, namaBarang);
-    vector<string> searchResult = searchDataByName(subData, namaBarang);
-    if (searchResult.size() > 0)
-    {
+    editData:
+    clear_screen();
+
+    cout << "========== EDIT BARANG ==========\n";
+    cout << "MASUKKAN NAMA BARANG : ";
+    getline(cin, itemName);
+
+    vector<string> searchResult = searchDataByName(subData, itemName);
+    if (searchResult.size() > 0) {
       showData({searchResult});
 
-      cout << "Tekan enter jika data tidak diubah. \n";
-      cout << "Masukkan Nama Baru: ";
-      getline(cin, namaBarang);
-      cout << "Masukkan Banyak Barang Baru: ";
-      getline(cin, banyakBarang);
-      cout << "Masukkan Harga Barang Baru: ";
-      getline(cin, hargaBarang);
-      if (userData[3] == "-")
-      {
-        cout << "Masukkan Lokasi Barang Baru: ";
-        getline(cin, lokasiBarang);
-      }
-      else
-      {
-        lokasiBarang = searchResult[4];
-      }
-      cout << "Masukkan Tanggal Masuk Baru: ";
-      getline(cin, tanggalMasuk);
+      inputEdit:
+      cout << "TEKAN ENTER JIKA DATA TIDAK DIUBAH" << endl;
+      cout << "MASUKKAN NAMA BARU : ";
+      getline(cin, itemName);
 
-      // set default value jika input tidak diisi
-      namaBarang = namaBarang.empty() ? searchResult[1] : namaBarang;
-      banyakBarang = banyakBarang.empty() ? searchResult[2] : banyakBarang;
-      hargaBarang = hargaBarang.empty() ? searchResult[3] : hargaBarang;
-      lokasiBarang = lokasiBarang.empty() ? searchResult[4] : lokasiBarang;
-      tanggalMasuk = tanggalMasuk.empty() ? searchResult[5] : tanggalMasuk;
+      int checkNameAvailability = searchDataByName(mainData, itemName).size();
+      if (checkNameAvailability > 0) {
+        cout << "NAMA TIDAK DAPAT DIGUNAKAN!!";
+        cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+        cin.get();
+        goto inputEdit;
+      }
 
-      vector<string> newData = {
-          searchResult[0],
-          namaBarang,
-          banyakBarang,
-          hargaBarang,
-          lokasiBarang,
-          tanggalMasuk,
-          getTimeNow(),
+      cout << "MASUKKAN BANYAK BARANG : ";
+      getline(cin, itemValue);
+      cout << "MASUKKAN HARGA BARANG : ";
+      getline(cin, itemPrice);
+
+      if (userData[4] == "-") {
+        cout << "MASUKKAN LOKASI BARU : ";
+        getline(cin, itemLocation);
+      } else {
+        itemLocation == searchResult[4];
+      }
+
+      cout << "MASUKKAN TANGGAL MASUK BARANG: ";
+      getline(cin, dateIn);
+
+      //Set data lama jika input tidak diisi
+      itemName  = itemName.empty() ? searchResult[1] : itemName;
+      itemValue = itemValue.empty() ? searchResult[2] : itemValue;
+      itemPrice = itemPrice.empty() ? searchResult[3] : itemPrice;
+      itemLocation = itemLocation.empty() ? searchResult[4] : itemLocation;
+      dateIn    = dateIn.empty() ? searchResult[5] : dateIn;
+
+      searchResult = searchDataByName(mainData, searchResult[1]);
+
+      mainData[stoi(searchResult[7])] = {
+        searchResult[0],
+        itemName,
+        itemValue,
+        itemPrice,
+        itemLocation,
+        dateIn,
+        getDateNow(),
       };
+      subData = getSubData(userData[4], mainData);
 
-      searchResult = searchDataByName(mainData, namaBarang);
-      mainData[stoi(searchResult[7])] = newData;
-      subData = getSubData(mainData, userData[3]);
-
-      cout << "Data Berhasil di Update!";
+      cout << "DATA BERHASIL DIUPDATE";
+      cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+      cin.get();
+      goto mainMenu;
+    } else {
+      cout << "BARANG TIDAK DITEMUKAN!!" << endl;
+      cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+      cin.get();
+      goto editData;
     }
-    else
-    {
-      cout << "Nama Barang Tidak Ditemukan!";
-    }
-  }
-  else if (pilihan == 6)
-  {
+  } else if (menu == 6) {
     goto landing;
+  } else {
+    cout << "MENU YANG ANDA PILIH SALAH!!";
+    cout << "\n\nTEKAN ENTER UNTUK MELANJUTKAN.....";
+    cin.ignore();
+    cin.get();
+    goto mainMenu;
   }
-  else
-  {
-    cout << "Nomor Menu yang anda masukkan salah. Silahkan coba lagi";
-  }
-
-  cin.ignore();
-  cin.get();
-  clear_screen();
-  goto menu;
 }
